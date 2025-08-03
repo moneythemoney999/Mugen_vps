@@ -1,13 +1,13 @@
-name: VPS WireGuard Facile
+name: VPS WireGuard
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
+  construire:
     runs-on: ubuntu-latest
     steps:
-      - name: Installer WireGuard + Générer tout
+      - name: Installer WireGuard et générer les clés
         run: |
           sudo apt update
           sudo apt install -y wireguard qrencode curl
@@ -16,20 +16,16 @@ jobs:
           wg genkey | tee cle_privee_serveur | wg pubkey > cle_publique_serveur
           wg genkey | tee cle_privee_client | wg pubkey > cle_publique_client
 
-          IP_PUB=$(curl -s ifconfig.me)
-          echo "Adresse IP publique du VPS : $IP_PUB"
+          echo "=== 🔐 Clé privée serveur ==="
+          cat cle_privee_serveur
+          echo "=== 🔐 Clé publique serveur ==="
+          cat cle_publique_serveur
+          echo "=== 🔐 Clé privée client ==="
+          cat cle_privee_client
+          echo "=== 🔐 Clé publique client ==="
+          cat cle_publique_client
 
-          echo "[Interface]
-PrivateKey = $(cat cle_privee_client)
-Address = 10.0.0.2/24
-DNS = 1.1.1.1
+          echo "=== 🌐 IP publique du VPS ==="
+          curl ifconfig.me
 
-[Peer]
-PublicKey = $(cat cle_publique_serveur)
-Endpoint = $IP_PUB:51820
-AllowedIPs = 0.0.0.0/0" > client.conf
-
-          echo "=== 🎉 Fichier client.conf prêt ==="
-          cat client.conf
-
-          sleep 300  # pour que tu aies le temps de copier depuis les logs
+          echo "=== ✅ TERMINE ==="

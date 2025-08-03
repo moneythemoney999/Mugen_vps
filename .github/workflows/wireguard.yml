@@ -26,4 +26,6 @@ jobs:
         cat client_public.key
 
         echo "=== ✅ DONE ==="
-        sleep 300  # Pour que t'aies le temps de copier
+        curl ifconfig.me > ip_publique.txt
+        cat ip_publique.txt
+        sleep 300

@@ -1,0 +1,29 @@
+name: WireGuard VPS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Installer WireGuard et générer les clés
+      run: |
+        sudo apt update
+        sudo apt install -y wireguard qrencode
+
+        umask 077
+        wg genkey | tee server_private.key | wg pubkey > server_public.key
+        wg genkey | tee client_private.key | wg pubkey > client_public.key
+
+        echo "=== 🔐 Server Private Key ==="
+        cat server_private.key
+        echo "=== 🔐 Server Public Key ==="
+        cat server_public.key
+        echo "=== 🔐 Client Private Key ==="
+        cat client_private.key
+        echo "=== 🔐 Client Public Key ==="
+        cat client_public.key
+
+        echo "=== ✅ DONE ==="
+        sleep 300  # Pour que t'aies le temps de copier

@@ -1,31 +1,32 @@
-name: VPS WireGuard
+name: WireGuard VPS
 
 on:
   workflow_dispatch:
 
 jobs:
-  construire:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Installer WireGuard et générer les clés
-        run: |
-          sudo apt update
-          sudo apt install -y wireguard qrencode curl
+    - name: Installer WireGuard et générer les clés
+      run: |
+        sudo apt update
+        sudo apt install -y wireguard qrencode
 
-          umask 077
-          wg genkey | tee cle_privee_serveur | wg pubkey > cle_publique_serveur
-          wg genkey | tee cle_privee_client | wg pubkey > cle_publique_client
+        umask 077
+        wg genkey | tee server_private.key | wg pubkey > server_public.key
+        wg genkey | tee client_private.key | wg pubkey > client_public.key
 
-          echo "=== 🔐 Clé privée serveur ==="
-          cat cle_privee_serveur
-          echo "=== 🔐 Clé publique serveur ==="
-          cat cle_publique_serveur
-          echo "=== 🔐 Clé privée client ==="
-          cat cle_privee_client
-          echo "=== 🔐 Clé publique client ==="
-          cat cle_publique_client
+        # Ne plus afficher les clés (juste IP publique si tu veux)
+        curl ifconfig.me > ip_publique.txt
+        echo "✅ Terminé. IP enregistrée dans ip_publique.txt"
 
-          echo "=== 🌐 IP publique du VPS ==="
-          curl ifconfig.me
-
-          echo "=== ✅ TERMINE ==="
+    - name: Télécharger les fichiers de configuration
+      uses: actions/upload-artifact@v4
+      with:
+        name: fichiers-vpn
+        path: |
+          server_private.key
+          server_public.key
+          client_private.key
+          client_public.key
+          ip_publique.txt
